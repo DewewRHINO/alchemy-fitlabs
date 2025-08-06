@@ -604,7 +604,7 @@ header
     padding: 0px !important;
     border: none !important;
     background: #f7f7f7 !important;
-    color: #fff !important;
+    color: #000 !important;
   }
   .header-area .main-nav .nav li:last-child a {
     color: #fff !important;
@@ -1455,4 +1455,45 @@ a.main-button:hover {
 
 .ui-tabs-anchor {
   color: #000 !important;
+}
+
+@media (max-width: 991px) {
+  .header-area .main-nav {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    background-color: #ffffff;
+    overflow-y: auto;
+    height: 100vh;
+    padding-top: 80px;
+  }
+
+  .header-area .main-nav .nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .header-area .main-nav .nav li {
+    width: 100%;
+    text-align: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .header-area .main-nav .nav li a {
+    font-size: 18px;
+    font-weight: bold;
+    color: #111 !important;
+  }
+
+  .header-area .main-nav .menu-trigger {
+    z-index: 10000;
+  }
+
+  .header-area .main-nav .nav li:last-child {
+    border-bottom: none;
+  }
 }
