@@ -747,7 +747,7 @@ features
   margin-top: 0px;
   margin-bottom: 7px;
   letter-spacing: 0.25px;
-  color: #fff;
+  color: #000;
   font-size: 19px;
   font-weight: 600;
   text-transform: capitalize;
@@ -878,7 +878,7 @@ Our Classes
 .tabs-content h4 {
   font-size: 23px;
   font-weight: 700;
-  color: #fff;
+  color: #000;
   letter-spacing: 0.5px;
   margin-bottom: 20px;
   margin-top: 30px;
@@ -1013,7 +1013,7 @@ trainers
 #trainers .trainer-item span {
   font-size: 13px;
   font-weight: 500;
-  color: #5eff00;
+  color: #000;
   display: inline-block;
   margin-top: 25px;
   margin-bottom: 10px;
@@ -1022,7 +1022,7 @@ trainers
 #trainers .trainer-item h4 {
   font-size: 19px;
   font-weight: 600;
-  color: #fff;
+  color: #000;
   letter-spacing: 0.5px;
   margin-bottom: 18px;
 }
