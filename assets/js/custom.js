@@ -1,96 +1,141 @@
 (function ($) {
   "use strict";
 
-  $(function () {
-    $("#tabs").tabs();
-  });
+  /* --------------------------------
+   * Helpers
+   * -------------------------------- */
+  function updateHeaderBg() {
+    var scroll = window.scrollY || $(window).scrollTop();
+    var box = $(".header-text").outerHeight() || 0;
+    var headerH = $("header").outerHeight() || 80;
 
-  $(window).scroll(function () {
-    var scroll = $(window).scrollTop();
-    var box = $(".header-text").height();
-    var header = $("header").height();
+    // Theme-like threshold: after hero or ~50px, whichever is greater
+    var threshold = Math.max(50, box - headerH);
 
-    if (scroll >= box - header) {
+    if (scroll >= threshold) {
       $("header").addClass("background-header");
     } else {
       $("header").removeClass("background-header");
     }
+  }
+
+  function mobileNav() {
+    var width = $(window).width();
+    // Submenu open/close on mobile only
+    $(".submenu")
+      .off("click._mobSub")
+      .on("click._mobSub", function () {
+        if (width < 767) {
+          $(".submenu ul").removeClass("active");
+          $(this).find("ul").toggleClass("active");
+        }
+      });
+  }
+
+  /* --------------------------------
+   * Tabs (jQuery UI)
+   * -------------------------------- */
+  $(function () {
+    if ($("#tabs").length && $.fn.tabs) {
+      $("#tabs").tabs();
+    }
   });
 
+  /* --------------------------------
+   * Header background on scroll
+   * (single source of truth)
+   * -------------------------------- */
+  $(window).on("load scroll", updateHeaderBg);
+  updateHeaderBg();
+
+  /* --------------------------------
+   * Schedule filter
+   * -------------------------------- */
   $(".schedule-filter li").on("click", function () {
     var tsfilter = $(this).data("tsfilter");
     $(".schedule-filter li").removeClass("active");
     $(this).addClass("active");
-    if (tsfilter == "all") {
+
+    if (tsfilter === "all") {
       $(".schedule-table").removeClass("filtering");
       $(".ts-item").removeClass("show");
     } else {
       $(".schedule-table").addClass("filtering");
+      $(".ts-item").each(function () {
+        var $it = $(this);
+        $it.toggleClass("show", $it.data("tsmeta") === tsfilter);
+      });
     }
-    $(".ts-item").each(function () {
-      $(this).removeClass("show");
-      if ($(this).data("tsmeta") == tsfilter) {
-        $(this).addClass("show");
-      }
-    });
   });
 
-  // Window Resize Mobile Menu Fix
-  mobileNav();
+  /* --------------------------------
+   * Scroll animation init
+   * -------------------------------- */
+  if (typeof scrollReveal !== "undefined") {
+    window.sr = new scrollReveal();
+  }
 
-  // Scroll animation init
-  window.sr = new scrollReveal();
-
-  // Menu Dropdown Toggle
+  /* --------------------------------
+   * Burger / Mobile menu toggle
+   * (matches original theme behavior)
+   * -------------------------------- */
   if ($(".menu-trigger").length) {
-    $(".menu-trigger").on("click", function () {
+    $(".menu-trigger").on("click", function (e) {
+      e.preventDefault();
       $(this).toggleClass("active");
-      $(".header-area .nav").slideToggle(200);
+      // Slide just the UL.nav; header remains 80px tall (theme default)
+      $(".header-area .nav").slideToggle(200, function () {
+        // After open/close, re-evaluate header bg state
+        updateHeaderBg();
+      });
     });
   }
 
+  /* --------------------------------
+   * Smooth scroll + active link highlight
+   * -------------------------------- */
   $(document).ready(function () {
     $(document).on("scroll", onScroll);
 
-    //smoothscroll
     $('.scroll-to-section a[href^="#"]').on("click", function (e) {
       e.preventDefault();
       $(document).off("scroll");
 
-      $("a").each(function () {
-        $(this).removeClass("active");
-      });
+      $("a").removeClass("active");
       $(this).addClass("active");
 
-      var target = this.hash,
-        menu = target;
       var target = $(this.hash);
+      if (!target.length) return;
+
       $("html, body")
         .stop()
         .animate(
-          {
-            scrollTop: target.offset().top + 1,
-          },
+          { scrollTop: target.offset().top + 1 },
           500,
           "swing",
           function () {
-            window.location.hash = target;
+            window.location.hash = target.selector;
             $(document).on("scroll", onScroll);
           }
         );
     });
   });
 
-  function onScroll(event) {
+  function onScroll() {
     var scrollPos = $(document).scrollTop();
-    $(".nav a").each(function () {
+    $(".nav a[href^='#']").each(function () {
       var currLink = $(this);
-      var refElement = $(currLink.attr("href"));
-      if (
-        refElement.position().top <= scrollPos &&
-        refElement.position().top + refElement.height() > scrollPos
-      ) {
-        $(".nav ul li a").removeClass("active");
+      var href = currLink.attr("href");
+      if (!href || href === "#") return;
+
+      var refElement = $(href);
+      if (!refElement.length) return;
+
+      var top = refElement.position().top;
+      var bottom = top + refElement.outerHeight();
+
+      if (top <= scrollPos && bottom > scrollPos) {
+        $(".nav a").removeClass("active");
         currLink.addClass("active");
       } else {
         currLink.removeClass("active");
@@ -98,33 +143,18 @@
     });
   }
 
-  // Page loading animation
+  /* --------------------------------
+   * Preloader
+   * -------------------------------- */
   $(window).on("load", function () {
     $("#js-preloader").addClass("loaded");
   });
 
-  // Window Resize Mobile Menu Fix
+  /* --------------------------------
+   * Resize handlers
+   * -------------------------------- */
   $(window).on("resize", function () {
     mobileNav();
   });
-
-  // Window Resize Mobile Menu Fix
-  function mobileNav() {
-    var width = $(window).width();
-    $(".submenu").on("click", function () {
-      if (width < 767) {
-        $(".submenu ul").removeClass("active");
-        $(this).find("ul").toggleClass("active");
-      }
-    });
-  }
-
-  window.addEventListener("scroll", function () {
-    const header = document.querySelector(".header-area");
-    if (window.scrollY > 50) {
-      header.classList.add("background-header");
-    } else {
-      header.classList.remove("background-header");
-    }
-  });
+  mobileNav();
 })(window.jQuery);
